@@ -1,0 +1,19 @@
+# Secrets & local config — never publish
+.env
+.env.*
+*.local
+secrets.*
+credentials.*
+*.pem
+*.key
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Logs & temp
+*.log
+node_modules/
