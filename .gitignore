@@ -18,3 +18,13 @@ Thumbs.db
 *.log
 node_modules/
 .playwright-mcp/
+
+# Local Claude/agent tooling — not part of the published site
+.agents/
+.claude/agents/
+.claude/skills/
+skills-lock.json
+
+# Local test/working screenshots
+enquiry-filled.png
+enquiry-submitted.png
