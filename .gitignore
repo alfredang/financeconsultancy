@@ -17,3 +17,4 @@ Thumbs.db
 # Logs & temp
 *.log
 node_modules/
+.playwright-mcp/

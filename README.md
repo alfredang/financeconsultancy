@@ -2,6 +2,8 @@
 
 A single-file marketing landing page for an investment-strategy consultancy. The entire site — HTML, CSS, and JavaScript — lives in [index.html](index.html). No build step, package manager, framework, or dependencies.
 
+![Screenshot of the FinanceGuru landing page](screenshot.png)
+
 ## Getting started
 
 Open [index.html](index.html) directly in a browser, or serve the directory with any static server:
