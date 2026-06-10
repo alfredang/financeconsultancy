@@ -412,6 +412,8 @@
     .socials svg { width: 19px; height: 19px; }
     .disclaimer { border-top: 1px solid rgba(255, 255, 255, .12); padding-top: 22px; font-size: .85rem; color: rgba(255, 255, 255, .55); line-height: 1.7; }
     .copyright { margin-top: 14px; font-size: .85rem; color: rgba(255, 255, 255, .5); }
+    .copyright a { color: rgba(255, 255, 255, .7); text-decoration: none; transition: color .2s ease; }
+    .copyright a:hover { color: var(--gold-soft); }
 
     /* ===================== Scroll Reveal ===================== */
     .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
@@ -943,6 +945,7 @@
         This website is for informational purposes only and does not constitute financial advice. Figures shown are illustrative. Please consult a qualified financial professional before making investment decisions.
       </div>
       <div class="copyright">© <span id="year">2026</span> FinanceGuru. All rights reserved.</div>
+      <div class="copyright">Powered by <a href="https://www.tertiaryinfotech.com/" target="_blank" rel="noopener">Tertiary Infotech Academy Pte Ltd</a></div>
     </div>
   </footer>
 
@@ -1117,21 +1120,62 @@
         });
       });
 
+      // Post-submission hook: speak a confirmation aloud via the Web Speech API.
+      // The submit handler runs inside the user's click gesture, so speech is
+      // allowed to start. Guarded for browsers without speechSynthesis support.
+      function speakThankYou() {
+        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return;
+        try {
+          window.speechSynthesis.cancel();
+          var u = new SpeechSynthesisUtterance(
+            'Hurray, Thank you for submission. We will get back to you in one business day.'
+          );
+          u.lang = 'en-US';
+          u.rate = 1;
+          u.pitch = 1;
+          window.speechSynthesis.speak(u);
+        } catch (err) { /* speech is best-effort; never block submission UX */ }
+      }
+
       form.addEventListener('submit', function (e) {
+        // Submit is always handled here (AJAX) so the page stays put and the
+        // post-submission voice message can finish playing.
+        e.preventDefault();
+
         var okName = validateName();
         var okEmail = validateEmail();
         var okPhone = validatePhone();
         if (!(okName && okEmail && okPhone)) {
-          e.preventDefault();
           msg.className = 'form-msg error';
           msg.textContent = 'Please correct the highlighted fields and try again.';
           var firstInvalid = form.querySelector('.field.invalid input');
           if (firstInvalid) firstInvalid.focus();
           return;
         }
-        // Valid: allow native POST to FormSubmit. Show confirming message.
+
         msg.className = 'form-msg success';
         msg.textContent = 'Thank you! Submitting your request…';
+
+        // FormSubmit's AJAX endpoint returns JSON instead of redirecting.
+        fetch('https://formsubmit.co/ajax/angch@tertiaryinfotech.com', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json' },
+          body: new FormData(form)
+        })
+          .then(function (res) {
+            if (!res.ok) throw new Error('Bad response');
+            return res.json();
+          })
+          .then(function () {
+            msg.className = 'form-msg success';
+            msg.textContent = 'Thank you! We will get back to you in one business day.';
+            form.reset();
+            speakThankYou(); // post-submission voice hook
+          })
+          .catch(function () {
+            msg.className = 'form-msg error';
+            msg.textContent = 'Sorry, something went wrong sending your request. Please email or WhatsApp us instead.';
+          });
       });
 
       /* ---------- Footer year ---------- */
